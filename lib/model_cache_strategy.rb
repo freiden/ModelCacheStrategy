@@ -1,9 +1,16 @@
 require "model_cache_strategy/version"
+require 'active_support/core_ext/module/attribute_accessors'
+require 'active_support/core_ext/numeric'
+require 'logger'
 
 module ModelCacheStrategy
-  mattr_accessor :resource_strategies # Used in strategies registration
+  mattr_writer :configuration
 
+  mattr_accessor :resource_strategies # Used in strategies registration
   self.resource_strategies = {}
+
+  mattr_accessor :logger
+  self.logger = ::Logger.new(STDOUT)
 
   def self.adapters=(adapters)
     @adapters = AdaptersProxy.new(adapters)
@@ -11,6 +18,14 @@ module ModelCacheStrategy
 
   def self.adapters
     @adapters || []
+  end
+
+  def self.configuration
+    @configuration ||= Configuration.new
+  end
+
+  def self.configure
+    yield(configuration)
   end
 
   def self.for(identifier = nil)
@@ -24,7 +39,13 @@ module ModelCacheStrategy
   def self.resource_name_for_strategy(klass)
     resource_strategies.invert[klass]
   end
+
+  def self.reset
+    @configuration = Configuration.new
+  end
 end
 
+require 'model_cache_strategy/configuration'
 require 'model_cache_strategy/adapters'
 require 'model_cache_strategy/adapters_proxy'
+require 'model_cache_strategy/error'

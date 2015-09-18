@@ -28,8 +28,11 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'sidekiq', '~> 3.3.4'
   spec.add_dependency 'aws-sdk', '~> 2.1.21'
+  spec.add_dependency 'rails', '~> 3.2'
 
   spec.add_development_dependency "bundler", "~> 1.10"
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "rspec"
+  spec.add_development_dependency "pry"
+  spec.add_development_dependency "pry-byebug"
 end

@@ -5,5 +5,9 @@ module ModelCacheStrategy
     initializer 'activeservice.autoload', :before => :set_autoload_paths do |app|
       app.config.autoload_paths << "#{app.config.root}/app/model_cache_strategies"
     end
+
+    initializer 'gem logger' do
+      ModelCacheStrategy.logger = Rails.logger
+    end
   end
 end

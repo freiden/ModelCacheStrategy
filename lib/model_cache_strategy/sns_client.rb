@@ -1,24 +1,33 @@
+require 'aws-sdk'
+
 module ModelCacheStrategy
   class SnsClient < SimpleDelegator
-    attr_reader :topic_name
     alias :client :__getobj__
 
-    def self.new(topic_name)
-      return nil unless topic_name
-      super
+    def initialize(credentials)
+      __setobj__(Aws::SNS::Client.new(credentials))
     end
 
-    def initialize(topic_name:, sns_settings)
-      @topic_name = topic_name
-      __setobj__(Aws::SNS::Client.new)
+    def get_topic_by_name(topic_name)
+      topics.detect { |topic| topic.topic_arn.match(/:#{topic_name}$/) }
     end
 
-    def topic
-      @topic ||= client.list_topics.topics.detect { |topic| topic.topic_arn.match(/:#{topic_name}$/) }
+    def topic_exist?(topic_name)
+      !!topics.detect { |topic| topic.topic_arn.match(/:#{topic_name}$/) }
     end
 
-    def publish(message_hash)
+    def topics
+      @topics ||= client.list_topics.topics
+    end
+
+    def publish(topic_name, message_hash)
       begin
+        topic = get_topic_by_name(topic_name)
+
+        unless topic
+          raise ModelCacheStrategy::UnknowTopicNameError, "Topic #{topic_name} has not been found, please check your SNS topics list!"
+        end
+
         response = client.publish({
           topic_arn: topic.topic_arn,
           message_structure: 'json',
@@ -32,5 +41,6 @@ module ModelCacheStrategy
         ModelCacheStrategy::logger.error e.backtrace
       end
     end
+
   end
 end

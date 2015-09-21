@@ -1,5 +1,10 @@
 module ModelCacheStrategy
   class AdaptersProxy
+    def self.new(adapters)
+      return [] unless adapters.present?
+      super
+    end
+
     def initialize(adapters)
       @adapters = Array(adapters)
     end

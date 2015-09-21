@@ -3,18 +3,7 @@ require 'net/http'
 module ModelCacheStrategy
   module Adapters
     class Varnish < Base
-      attr_accessor :expiration_regexp, :cache_max_age, :custom_cache_header, :addr
-      # attr_accessor :expiration_regexp, :addr
-
-      DEFAULT_HOST_ADDRESS = 'http://localhost'.freeze
-      CUSTOM_CACHE_HEADER = 'X-Invalidated-By'.freeze
-      CACHE_MAX_AGE = 6.hours #900
-
-      def initialize(addr: DEFAULT_HOST_ADDRESS, cache_max_age: CACHE_MAX_AGE, custom_cache_header: CUSTOM_CACHE_HEADER)
-        @addr = addr
-        @cache_max_age = cache_max_age
-        @custom_cache_header = custom_cache_header
-      end
+      attr_accessor :expiration_regexp
 
       def cache_control
         ['Cache-Control', "max-age=#{cache_max_age}, public"]
@@ -23,12 +12,13 @@ module ModelCacheStrategy
       def expire
         yield self
         # call_varnish(expiration_regexp.uniq)
-        settings = {
-          addr: self.addr,
-          cache_max_age: self.cache_max_age,
-          custom_cache_header: self.custom_cache_header,
-        }
-        VarnishCacheExpirationsWorker.perform_async(expiration_regexp.uniq, settings)
+        # settings = {
+        #   host: self.host,
+        #   cache_max_age: self.cache_max_age,
+        #   custom_cache_header: self.custom_cache_header,
+        # }
+        # VarnishCacheExpirationsWorker.perform_async(expiration_regexp.uniq, settings)
+        VarnishCacheExpirationsWorker.perform_async(expiration_regexp.uniq, ModelCacheStrategy.configuration.varnish)
       end
 
       def set_expiration(name, ids = [])
@@ -41,7 +31,7 @@ module ModelCacheStrategy
       def call_varnish(regex_array)
         banning_key = regex_array.join('|')
 
-        uri = URI.parse(addr)
+        uri = URI.parse(ModelCacheStrategy.configuration.varnish[:host])
         http = Net::HTTP.new(uri.host, uri.port)
         request = Ban.new(uri.request_uri)
         request.initialize_http_header({ 'X-Invalidates' => banning_key })

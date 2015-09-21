@@ -12,12 +12,9 @@ module ModelCacheStrategy
   mattr_accessor :logger
   self.logger = ::Logger.new(STDOUT)
 
-  def self.adapters=(adapters)
-    @adapters = AdaptersProxy.new(adapters)
-  end
 
   def self.adapters
-    @adapters || []
+    ModelCacheStrategy.configuration.adapters || []
   end
 
   def self.configuration
@@ -47,5 +44,7 @@ end
 
 require 'model_cache_strategy/configuration'
 require 'model_cache_strategy/adapters'
+require 'model_cache_strategy/cache_strategies'
 require 'model_cache_strategy/adapters_proxy'
+require 'model_cache_strategy/sns_client'
 require 'model_cache_strategy/error'

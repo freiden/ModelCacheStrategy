@@ -1,0 +1,2 @@
+require 'model_cache_strategy/cache_strategies/default_cache_strategy'
+require 'model_cache_strategy/cache_strategies/no_cache_strategy'

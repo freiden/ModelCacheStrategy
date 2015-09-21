@@ -5,9 +5,10 @@ module ModelCacheStrategy
 
     let(:default_sns_settings) {
       {
-        aws_region: ENV['AWS_REGION'], #'xx-west-1',
-        aws_access_key_id: ENV['AWS_ACCESS_KEY_ID'], #'AAAABBBBCCCCDDDDEEEEFFFFF',
-        aws_secret_access_key: ENV['AWS_SECRET_ACCESS_KEY'], #'AAAbbbCCC-ddddEEE/hhh'
+        region: ENV['AWS_REGION'], #'xx-west-1',
+        access_key_id: ENV['AWS_ACCESS_KEY_ID'], #'AAAABBBBCCCCDDDDEEEEFFFFF',
+        secret_access_key: ENV['AWS_SECRET_ACCESS_KEY'], #'AAAbbbCCC-ddddEEE/hhh',
+        topic_name: nil,
       }
     }
 
@@ -17,7 +18,15 @@ module ModelCacheStrategy
         host: 'http://localhost',
         cache_max_age: 900
       }
+
+      # let(:adapters) { [] }
     }
+
+    # describe "#adapters" do
+    #   it "return an Array object" do
+
+    #   end
+    # end
 
     describe "#varnish" do
       it "return a Hash object" do
@@ -68,7 +77,7 @@ module ModelCacheStrategy
       end
 
       it "raise an exception when giving an invalid sns_settings parameters" do
-        settings = { aws_region: nil, aws_access_key_id: nil }
+        settings = { region: nil, access_key_id: nil }
         expect { Configuration.new(sns_settings: settings) }.to raise_error(InvalidSettingsError)
       end
 
@@ -85,6 +94,13 @@ module ModelCacheStrategy
         settings = { complementary_host: 'red is dead' }
 
         expect { Configuration.new(sns_settings: settings) }.to raise_error(ArgumentError)
+      end
+
+      it "has the topic_name when given " do
+        settings = default_sns_settings.merge(topic_name: 'red is dead')
+        config = Configuration.new(sns_settings: settings)
+
+        expect(config.sns[:topic_name]).to eql(settings[:topic_name])
       end
     end
 

@@ -1,10 +1,17 @@
 module ModelCacheStrategy
   module Adapters
     class Sns < Base
-      attr_accessor :expiration_list, :sns_client, :topic_name
+      # attr_accessor :expiration_list, :sns_client, :topic_name
+      attr_accessor :expiration_list
+      attr_reader :configuration
 
-      def initialize(topic_name = DEFAULT_TOPIC_NAME)
-        @sns_client = SnsClient.new(topic_name) # TODO: use get_sns_client method!!!
+      # def initialize(topic_name)
+      #   @sns_client = SnsClient.new(topic_name)
+      # end
+
+      def initialize
+        @configuration = ModelCacheStrategy.configuration
+        self
       end
 
       def expire
@@ -25,12 +32,6 @@ module ModelCacheStrategy
 
           sns_client.publish(message)
         end
-      end
-
-    private
-
-      def get_sns_client
-        # .... TODO!!
       end
     end
   end

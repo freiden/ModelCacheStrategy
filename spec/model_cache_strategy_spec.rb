@@ -13,9 +13,10 @@ describe ModelCacheStrategy do
 
   let(:sns_settings) {
     {
-      aws_region: 'xx-east-1',
-      aws_access_key_id: 'AAAABBBBCCCCDDDDEEEEFFFFF',
-      aws_secret_access_key: 'AAAbbbCCC-ddddEEE/hhh',
+      region: 'xx-east-1',
+      access_key_id: 'AAAABBBBCCCCDDDDEEEEFFFFF',
+      secret_access_key: 'AAAbbbCCC-ddddEEE/hhh',
+      topic_name: 'test-topic',
     }
   }
 
@@ -29,9 +30,10 @@ describe ModelCacheStrategy do
 
   let(:sns_default_settings) {
     {
-      aws_region: 'xx-west-1',
-      aws_access_key_id: 'AAAABBBBCCCCDDDDEEEEFFFFF',
-      aws_secret_access_key: 'AAAbbbCCC-ddddEEE/hhh',
+      region: 'xx-west-1',
+      access_key_id: 'AAAABBBBCCCCDDDDEEEEFFFFF',
+      secret_access_key: 'AAAbbbCCC-ddddEEE/hhh',
+      topic_name: nil,
     }
   }
 
@@ -57,6 +59,14 @@ describe ModelCacheStrategy do
       sns_configuration = ModelCacheStrategy.configuration.sns
       expect(sns_configuration).to be_truthy
       expect(sns_configuration).to eq(sns_settings)
+    end
+  end
+
+  describe "#sns_client" do
+    it "returns a valid instance of sns_client" do
+      config = ModelCacheStrategy.configuration
+      expect(config.sns_client).to be_truthy
+      expect(config.sns_client.class).to eql(ModelCacheStrategy::SnsClient)
     end
   end
 

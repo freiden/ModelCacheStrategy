@@ -5,26 +5,22 @@ module ModelCacheStrategy
     class Varnish < Base
       attr_accessor :expiration_regexp
 
+      def self.type
+        :varnish
+      end
+
       def cache_control
         ['Cache-Control', "max-age=#{cache_max_age}, public"]
       end
 
-      def expire
+      def expire!
         yield self
-        # call_varnish(expiration_regexp.uniq)
-        # settings = {
-        #   host: self.host,
-        #   cache_max_age: self.cache_max_age,
-        #   custom_cache_header: self.custom_cache_header,
-        # }
-        # VarnishCacheExpirationsWorker.perform_async(expiration_regexp.uniq, settings)
-        VarnishCacheExpirationsWorker.perform_async(expiration_regexp.uniq, ModelCacheStrategy.configuration.varnish)
+        ModelCacheStrategy::Workers::VarnishCacheExpirationsWorker.perform_async(expiration_regexp.uniq)
       end
 
       def set_expiration(name, ids = [])
         ids = Array(ids)
         self.expiration_regexp ||= []
-        # "#{global_cache_key}($|.*/#{self.id}(/|$))".gsub('/', '\/') # TODELETE # regex to use
         self.expiration_regexp << generate_expiration_regex(name, ids) unless ids.blank?
       end
 
@@ -50,7 +46,8 @@ module ModelCacheStrategy
       end
 
       def type
-        :http
+        # :varnish
+        self.class.type
       end
 
     private

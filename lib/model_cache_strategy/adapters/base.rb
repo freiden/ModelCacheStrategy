@@ -2,7 +2,7 @@ module ModelCacheStrategy
   module Adapters
     class Base
 
-      def expire
+      def expire!
         raise 'TBD in each adapter'
       end
 

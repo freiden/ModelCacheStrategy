@@ -30,10 +30,9 @@ module ModelCacheStrategy
 
         response = client.publish({
           topic_arn: topic.topic_arn,
-          message_structure: 'json',
+          # message_structure: 'json',
           message: message_hash.merge({ default: 'cb_message' }).to_json
         })
-        # Rails.logger.tagged('PUBLISH') { |logger| logger.debug 'RESPONSE ' + response.inspect }
         ModelCacheStrategy::logger.debug 'RESPONSE' + response.inspect
         response
       rescue Exception => e

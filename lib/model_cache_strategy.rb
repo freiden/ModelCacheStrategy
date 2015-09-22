@@ -44,6 +44,7 @@ end
 
 require 'model_cache_strategy/configuration'
 require 'model_cache_strategy/adapters'
+require 'model_cache_strategy/callbacks'
 require 'model_cache_strategy/cache_strategies'
 require 'model_cache_strategy/adapters_proxy'
 require 'model_cache_strategy/sns_client'

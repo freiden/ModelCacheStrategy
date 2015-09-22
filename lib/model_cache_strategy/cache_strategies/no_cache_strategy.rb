@@ -24,7 +24,7 @@ module ModelCacheStrategy
         ModelCacheStrategy.configuration.adapters
       end
 
-      def initialize(resource = nil)
+      def initialize(*args)
       end
 
 

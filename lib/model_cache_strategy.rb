@@ -26,7 +26,7 @@ module ModelCacheStrategy
   end
 
   def self.for(identifier = nil)
-    resource_strategies.fetch(identifier) { NoCacheStrategy }
+    resource_strategies.fetch(identifier) { ModelCacheStrategy::CacheStrategies::NoCacheStrategy }
   end
 
   def self.register_strategy_for(resource, klass)

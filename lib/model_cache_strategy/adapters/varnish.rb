@@ -10,7 +10,8 @@ module ModelCacheStrategy
         :varnish
       end
 
-      def cache_control
+      def cache_control(cache_max_age = nil)
+        cache_max_age ||= ModelCacheStrategy.configuration.varnish[:cache_max_age]
         ['Cache-Control', "max-age=#{cache_max_age}, public"]
       end
 

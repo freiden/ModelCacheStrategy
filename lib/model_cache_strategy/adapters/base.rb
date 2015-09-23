@@ -6,7 +6,7 @@ module ModelCacheStrategy
         raise 'TBD in each adapter'
       end
 
-      def cache_control
+      def cache_control(_)
         []
       end
 
@@ -15,7 +15,7 @@ module ModelCacheStrategy
       end
 
       def type
-        :basic
+        raise 'TBD in each adapter'
       end
 
       def enabled?

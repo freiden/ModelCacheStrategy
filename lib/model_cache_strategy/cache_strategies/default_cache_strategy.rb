@@ -13,17 +13,14 @@ module ModelCacheStrategy
       end
 
       def self.custom_cache_header(ids = nil)
-        if get_varnish_adapter.present?
-          [get_varnish_adapter.custom_cache_header, generate_cache_key(ids)]
-        else
-          ModelCacheStrategy.logger.warn "No Varnish adapter defined on this strategy: #{self} - Custom Cache Header not available."
-          ModelCacheStrategy::CacheStrategies::NoCacheStrategy.custom_cache_header
-        end
+        custom_cache_header = ModelCacheStrategy.configuration.varnish[:custom_cache_header]
+        [custom_cache_header, generate_cache_key(ids)]
       end
 
       def self.cache_control
         if get_varnish_adapter.present?
-          get_varnish_adapter.cache_control
+          cache_max_age = (used_adapters[:varnish] || {})[:cache_max_age]
+          get_varnish_adapter.cache_control(cache_max_age)
         else
           ModelCacheStrategy.logger.warn "No Varnish adapter defined on this strategy: #{self} - Cache-Control not available."
           ModelCacheStrategy::CacheStrategies::NoCacheStrategy.cache_control

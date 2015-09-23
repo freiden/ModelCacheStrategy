@@ -1,4 +1,5 @@
 require 'net/http'
+require 'model_cache_strategy/workers/varnish_cache_expirations_worker'
 
 module ModelCacheStrategy
   module Adapters
@@ -13,9 +14,9 @@ module ModelCacheStrategy
         ['Cache-Control', "max-age=#{cache_max_age}, public"]
       end
 
-      def expire!
+      def expire!(callback_type = nil)
         yield self
-        ModelCacheStrategy::Workers::VarnishCacheExpirationsWorker.perform_async(expiration_regexp.uniq)
+        ModelCacheStrategy::Workers::VarnishCacheExpirationsWorker.perform_async(expiration_regexp.uniq, callback_type)
       end
 
       def set_expiration(name, ids = [])
@@ -24,7 +25,7 @@ module ModelCacheStrategy
         self.expiration_regexp << generate_expiration_regex(name, ids) unless ids.blank?
       end
 
-      def call_varnish(regex_array)
+      def call_varnish(regex_array, callback_type: nil)
         banning_key = regex_array.join('|')
 
         uri = URI.parse(ModelCacheStrategy.configuration.varnish[:host])

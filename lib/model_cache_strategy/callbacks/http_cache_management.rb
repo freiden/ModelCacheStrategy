@@ -18,7 +18,6 @@ module ModelCacheStrategy
             after_destroy :expire_cached_resource, :unless => :skip_http_callbacks
 
             define_method :expire_cached_resource do
-              # puts ">"*50 + "[HttpCacheManagement] cached_resource_name: #{cached_resource_name}, class: #{self.class}"
               ModelCacheStrategy.for(cached_resource_name).new(self).expire!
             end
           end

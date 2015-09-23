@@ -1,7 +1,8 @@
+require 'model_cache_strategy/workers/sns_publication_worker'
+
 module ModelCacheStrategy
   module Adapters
     class Sns < Base
-      # attr_accessor :expiration_list, :sns_client, :topic_name
       attr_accessor :expiration_list
       attr_reader :configuration
 
@@ -14,9 +15,9 @@ module ModelCacheStrategy
         self
       end
 
-      def expire!
+      def expire!(callback_type = nil)
         yield self
-        ModelCacheStrategy::Workers::SnsPublicationWorker.perform_async(expiration_list)
+        ModelCacheStrategy::Workers::SnsPublicationWorker.perform_async(expiration_list, callback_type)
       end
 
       def set_expiration(name, ids = [])
@@ -26,11 +27,9 @@ module ModelCacheStrategy
         self.expiration_list[name].merge(ids) unless ids.blank?
       end
 
-      def call_sns(expiration_list)
+      def call_sns(expiration_list, callback_type: nil)
         expiration_list.each do |(resource_name, ids)|
-          # message = { resource_type: resource_name, resource_ids: ids.to_a, type: callback_type }
-          message = { resource_type: resource_name, resource_ids: ids.to_a }
-
+          message = { resource_type: resource_name, resource_ids: ids.to_a, type: callback_type }
           configuration.sns_client.publish(configuration.sns[:topic_name], message)
         end
       end

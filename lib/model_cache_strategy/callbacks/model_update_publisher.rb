@@ -19,12 +19,6 @@ module ModelCacheStrategy
 
 
             define_method :publish_model_notification do |callback_type|
-              # puts ">"*50 + "[ModelCacheStrategy] cached_resource_name: #{cached_resource_name}, callback_type: #{callback_type}, class: #{self.class}"
-              # ModelCacheStrategy::Workers::SnsPublicationWorker.perform_async({
-              #   resource_type: cached_resource_name,
-              #   resource_id: self.id,
-              #   type: callback_type
-              # })
               ModelCacheStrategy.for(cached_resource_name).new(self).expire!
             end
           end

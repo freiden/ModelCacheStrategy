@@ -68,7 +68,6 @@ module ModelCacheStrategy
     def mcs_logger(level = :info, message:, additional: nil)
       logger_message = message
       logger_message << "\n#{additional}" if additional.present?
-      # ModelCacheStrategy::logger.tagged('ModelCacheStrategy') { |logger| logger.send(level, logger_message) }
       ModelCacheStrategy::logger.send(level, logger_message)
     end
 

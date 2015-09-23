@@ -64,7 +64,6 @@ module ModelCacheStrategy
       ################################################## Instance methods ##################################################
 
       def adapters
-        # ModelCacheStrategy.configuration.adapters
         get_current_adapters
       end
 
@@ -87,7 +86,7 @@ module ModelCacheStrategy
 
       def get_current_adapters
         @get_current_adapters ||= begin
-          _adapters = self.class.get_current_adapters #ModelCacheStrategy.configuration.adapters
+          _adapters = self.class.get_current_adapters
           _adapters.by_type(filtered_used_adapters.keys)
         end
       end

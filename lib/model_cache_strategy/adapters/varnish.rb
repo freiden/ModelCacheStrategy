@@ -26,6 +26,10 @@ module ModelCacheStrategy
         self.expiration_regexp << generate_expiration_regex(name, ids) unless ids.blank?
       end
 
+      def set_global_expiration(name, _)
+        self.expiration_regexp = %w('.*')
+      end
+
       def call_varnish(regex_array, callback_type: nil)
         banning_key = regex_array.join('|')
 

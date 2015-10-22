@@ -15,17 +15,9 @@ module ModelCacheStrategy
       @sns_client = get_sns_client                         if has_sns_adapter?
     end
 
-    # def adapters
-    #   @adapters
-    # end
-
     def adapters=(adapters = [])
       @adapters = set_adapters(adapters)
     end
-
-    # def sns
-    #   @sns
-    # end
 
     def sns=(sns_settings = {})
       @sns = if has_sns_adapter?
@@ -40,10 +32,6 @@ module ModelCacheStrategy
     def sns_client
       @sns_client ||= get_sns_client
     end
-
-    # def varnish
-    #   @varnish
-    # end
 
     def varnish=(varnish_settings = {})
       @varnish = if has_varnish_adapter?

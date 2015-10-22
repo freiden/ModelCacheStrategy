@@ -1,6 +1,10 @@
 module ModelCacheStrategy
   module Adapters
     class Base
+      # Method allowing to retrieve current class descendants:
+      def self.descendants
+        ObjectSpace.each_object(Class).select { |klass| klass < self }
+      end
 
       def expire!
         raise 'TBD in each adapter'

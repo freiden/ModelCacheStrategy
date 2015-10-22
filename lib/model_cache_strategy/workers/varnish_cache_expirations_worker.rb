@@ -7,7 +7,7 @@ module ModelCacheStrategy
 
       def perform(expiration_regex, callback_type = nil)
         adapter = ModelCacheStrategy::Adapters::Varnish.new
-        adapter.call_varnish(expiration_regex, callback_type: callback_type)
+        adapter.expire_cache!(expiration_regex, callback_type: callback_type)
       end
     end
 

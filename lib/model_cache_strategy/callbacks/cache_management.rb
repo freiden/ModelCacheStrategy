@@ -6,17 +6,17 @@ module ModelCacheStrategy
       extend ActiveSupport::Concern
 
       module ClassMethods
-        def hook_resource(resource)
+        def resource_hook(resource)
           class_eval do
             class_attribute :cached_resource_name
 
             self.send('cached_resource_name=', resource)
 
-            after_create  -> { hook_resource(:create) }, :unless => :skip_http_callbacks
-            after_update  -> { hook_resource(:update) }, :unless => :skip_http_callbacks
-            after_destroy -> { hook_resource(:delete) }, :unless => :skip_http_callbacks
+            after_create  -> { resource_hook(:create) }, :unless => :skip_http_callbacks
+            after_update  -> { resource_hook(:update) }, :unless => :skip_http_callbacks
+            after_destroy -> { resource_hook(:delete) }, :unless => :skip_http_callbacks
 
-            define_method :hook_resource do |callback_type|
+            define_method :resource_hook do |callback_type|
               ModelCacheStrategy.for(cached_resource_name).new(self, callback_type: callback_type).expire!
             end
           end

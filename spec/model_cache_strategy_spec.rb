@@ -5,9 +5,10 @@ require 'pry-byebug'
 describe ModelCacheStrategy do
   let(:varnish_settings) {
     {
-      host: 'http://localhost',
+      hosts_ips: %w(127.0.0.1),
       custom_cache_header: 'X-Invalidated-By',
       cache_max_age: 6.hours,
+      varnish_port: 80
     }
   }
 
@@ -22,9 +23,10 @@ describe ModelCacheStrategy do
 
   let(:varnish_default_settings) {
     {
-      host: 'http://localhost',
+      hosts_ips: %w(127.0.0.1),
       custom_cache_header: 'X-Invalidated-By',
       cache_max_age: 900,
+      varnish_port: 80
     }
   }
 
@@ -39,8 +41,12 @@ describe ModelCacheStrategy do
 
   before(:each) do
     ModelCacheStrategy.configure do |config|
-      config.varnish = varnish_settings
-      config.sns     = sns_settings
+      config.varnish  = varnish_settings
+      config.sns      = sns_settings
+      config.adapters = [
+        ModelCacheStrategy::Adapters::Varnish,
+        ModelCacheStrategy::Adapters::Sns,
+      ]
     end
   end
 
@@ -76,8 +82,8 @@ describe ModelCacheStrategy do
 
       config = ModelCacheStrategy.configuration
 
-      expect(config.varnish).to eq(varnish_default_settings)
-      expect(config.sns).to eq(sns_default_settings)
+      expect(config.varnish).to be_nil
+      expect(config.sns).to be_nil
     end
   end
 

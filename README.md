@@ -1,9 +1,5 @@
 # ModelCacheStrategy
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/model_cache_strategy`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
-
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -22,6 +18,7 @@ Or install it yourself as:
 
 ## Usage
 * Add an initializer for the gem into your app, defining the settings for the service your using:
+
 ```ruby
   ModelCacheStrategy.configure do |config|
     config.varnish = {
@@ -47,15 +44,19 @@ Or install it yourself as:
 * Stragegies must be defined in the 'app/model_cache_strategies' directory of your Rails app.
 * To associate a Model to a strategy:
   * Define a hook in the model class:
+  
     ```ruby
       resource_hook :assessments
     ```
+    
   * Declare the association into the gem initializer:
+  
     ```ruby
       ModelCacheStrategy.register_strategy_for(:assessments, AssessmentCacheStrategy)
     ```
 * Your strategies must inherit from the class DefaultCacheStrategy, defining the default behavior expecting with the managed services.
   * Your strategies must defined a protected method named *expire_cache*, using the defined adapters to expire the relateds contents:
+  
     ```ruby
       adapters.expire!(callback_type) do |ca|
         ca.set_expiration(self.class.cache_key, resource.id)
@@ -64,11 +65,14 @@ Or install it yourself as:
       end
     ```
   * Each strategies could use independently one of the defined adapters and specified on which callback it should run:
+  
     ```ruby
       use_adapter_for :sns,     topic_name: Gaston.sns.topic_name
       use_adapter_for :varnish
     ```
+    
   OR
+  
     ```ruby
       use_adapter_for :varnish, on: [:update, :delete]
     ```

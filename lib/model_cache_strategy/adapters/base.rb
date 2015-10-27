@@ -6,6 +6,10 @@ module ModelCacheStrategy
         ObjectSpace.each_object(Class).select { |klass| klass < self }
       end
 
+      def self.type
+        raise 'TBD in each adapter'
+      end
+
       def expire!
         raise 'TBD in each adapter'
       end
@@ -18,13 +22,17 @@ module ModelCacheStrategy
         raise 'TBD in each adapter'
       end
 
+      def set_global_expiration(name, ids)
+        raise 'TBD in each adapter'
+      end
+
       def type
         raise 'TBD in each adapter'
       end
 
-      def enabled?
-        true
-      end
+      # def enabled?
+      #   true
+      # end
     end
   end
 end

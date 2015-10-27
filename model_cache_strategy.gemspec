@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
   spec.name          = "model_cache_strategy"
   spec.version       = ModelCacheStrategy::VERSION
   spec.authors       = ["charles FD", "Guillaume Garcera"]
-  spec.email         = ["charles.freitas-denke@vodeclic.com"]
+  spec.email         = ["charles.freitas-denke@vodeclic.com", "guillaume.garcera@vodeclic.com"]
 
   spec.summary       = %q{Write a short summary, because Rubygems requires one.}
   spec.description   = %q{Write a longer description or delete this line.}

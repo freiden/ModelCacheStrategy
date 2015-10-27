@@ -1,6 +1,7 @@
 module ModelCacheStrategy
   class Configuration
-    attr_reader :varnish, :sns, :adapters
+    # attr_reader :varnish, :sns, :adapters
+    attr_reader :adapters
 
     DEFAULT_CACHE_MAX_AGE       = 900
     DEFAULT_CUSTOM_CACHE_HEADER = 'X-Invalidated-By'.freeze
@@ -19,34 +20,41 @@ module ModelCacheStrategy
       @adapters = set_adapters(adapters)
     end
 
-    def sns=(sns_settings = {})
-      @sns = if has_sns_adapter?
-        set_sns_settings(sns_settings)
-      else
+    def sns
+      if @sns && !has_sns_adapter?
         mcs_logger(:warn, message: "Sns Adapter is missing, the Sns Strategy can't be used without it!")
-        nil
+        return nil
       end
 
+      @sns
+    end
+
+    def sns=(sns_settings = {})
+      @sns = set_sns_settings(sns_settings)
     end
 
     def sns_client
       @sns_client ||= get_sns_client
     end
 
-    def varnish=(varnish_settings = {})
-      @varnish = if has_varnish_adapter?
-        set_varnish_settings(varnish_settings)
-      else
+    def varnish
+      unless has_varnish_adapter?
         mcs_logger(:warn, message: "Varnish Adapter is missing, the Varnish Strategy can't be used without it!")
-        nil
+        return nil
       end
+
+      @varnish
+    end
+
+    def varnish=(varnish_settings = {})
+      @varnish = set_varnish_settings(varnish_settings)
     end
 
 
   private
 
     def get_sns_client
-      return nil unless sns.present?
+      return nil unless has_sns_adapter?
 
       SnsClient.new(sns.select { |k,v| :topic_name != k }) #if sns.values.any? { |value| value.present? }
     end

@@ -49,6 +49,7 @@ module ModelCacheStrategy
       def self.get_current_adapters
         @get_current_adapters ||= begin
           _adapters = ModelCacheStrategy.configuration.adapters
+          # binding.pry
           _adapters.by_type(used_adapters.keys)
         end
       end
@@ -70,12 +71,18 @@ module ModelCacheStrategy
       end
 
       def expire!
-        return unless adapters.enabled?
+        # return unless adapters.enabled?
+        return unless adapters.any?
         expire_cache
       end
 
 
     protected
+
+      def dispatch_condition(conditional)
+        # conditional.call(...) used to manage Proc: Proc.new { |object| object.valid? }
+        conditional.is_a?(Symbol) ? self.send(conditional) : conditional.call(resource)
+      end
 
       def expire_cache
         raise "TBD in each strategy"
@@ -90,8 +97,30 @@ module ModelCacheStrategy
 
       def filtered_used_adapters
         used_adapters.select do |adapter_name, settings|
-          settings[:on].include?(callback_type)
+          # settings[:on].include?(callback_type)
+           has_valid_settings?(settings)
         end
+      end
+
+      def has_valid_settings?(settings)
+        # binding.pry
+        condition = true
+        on = settings[:on].include?(callback_type)
+
+        # # If conditional has precedence on unless conditional:
+        # if settings[:if].present? || settings[:unless].present?
+        #   conditional = settings[:if].presence || settings[:unless].presence
+        # end
+        if settings[:if].present?
+          condition = dispatch_condition(settings[:if])
+        end
+
+        if settings[:unless].present?
+          condition = dispatch_condition(settings[:unless])
+        end
+
+        # on && (conditional.is_a?(Symbol) ? self.send(conditional) : conditional.call(resource))
+        on && condition
       end
 
       def get_current_topic_name
@@ -101,6 +130,7 @@ module ModelCacheStrategy
       def get_current_cache_max_age
         (filtered_used_adapters[:varnish] || {})[:cache_max_age]
       end
+
 
     end
 

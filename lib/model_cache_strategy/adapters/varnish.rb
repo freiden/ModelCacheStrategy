@@ -26,16 +26,17 @@ module ModelCacheStrategy
         ['Cache-Control', "max-age=#{cache_max_age}, public"]
       end
 
-      def enabled?
-        result = %x(pidof varnishd).present?
-        puts "WARNING: Varnish is disabled on this system, baning request will not be sent!" unless result
-        result
-      end
+      # def enabled?
+      #   result = %x(pidof varnishd).present?
+      #   puts "WARNING: Varnish is disabled on this system, baning request will not be sent!" unless result
+      #   result
+      # end
 
       def expire!(callback_type = nil)
         yield self
 
-        ModelCacheStrategy::Workers::VarnishCacheExpirationsWorker.perform_async(expiration_regexp.uniq, callback_type)
+        Rails.logger.debug "="*50 + "> Expiring Varnish Cache for: #{expiration_regexp.uniq}, on: #{callback_type}"
+        # ModelCacheStrategy::Workers::VarnishCacheExpirationsWorker.perform_async(expiration_regexp.uniq, callback_type)
       end
 
       def expire_cache!(regex_array, callback_type: nil)
@@ -54,7 +55,7 @@ module ModelCacheStrategy
         generate_expiration_regex(name, ids) unless ids.blank?
       end
 
-      def set_global_expiration(name, _)
+      def set_global_expiration(_, _)
         self.expiration_regexp = %w('.*')
       end
 

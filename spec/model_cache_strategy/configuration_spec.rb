@@ -62,6 +62,7 @@ module ModelCacheStrategy
 
           initial_config = Configuration.new
           initial_config.varnish = default_varnish_settings
+          initial_config.varnish
         end
 
         it "doesn't set the varnish settings without the related adapter" do
@@ -124,6 +125,7 @@ module ModelCacheStrategy
 
           initial_config = Configuration.new
           initial_config.sns = default_sns_settings
+          initial_config.sns
         end
 
         it "doesn't set the sns settings without the related adapter" do

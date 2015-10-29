@@ -19,9 +19,10 @@ module ModelCacheStrategy
     let(:default_varnish_settings) {
       {
         custom_cache_header: 'X-Invalidated-By',
-        hosts_ips: %w(127.0.0.1),
-        cache_max_age: 900,
-        varnish_port: 80
+        hosts_ips: Array(ModelCacheStrategy::Configuration::DEFAULT_HOSTS_IPS),
+        cache_max_age: ModelCacheStrategy::Configuration::DEFAULT_CACHE_MAX_AGE,
+        varnish_port: ModelCacheStrategy::Configuration::DEFAULT_VARNISH_PORT,
+        worker_throttling: ModelCacheStrategy::Configuration::DEFAULT_THROTTLING_SETTINGS
       }
     }
 

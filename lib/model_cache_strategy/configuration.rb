@@ -7,6 +7,7 @@ module ModelCacheStrategy
     DEFAULT_CUSTOM_CACHE_HEADER = 'X-Invalidated-By'.freeze
     DEFAULT_HOSTS_IPS           = '127.0.0.1'.freeze
     DEFAULT_VARNISH_PORT        = 80
+    DEFAULT_THROTTLING_SETTINGS = { threshold: 3, period: 1.second }.freeze
 
 
     def initialize(varnish_settings: {}, sns_settings: {}, adapters: [])
@@ -81,12 +82,18 @@ module ModelCacheStrategy
       sns_settings
     end
 
-    def set_varnish_settings(custom_cache_header: DEFAULT_CUSTOM_CACHE_HEADER, hosts_ips: DEFAULT_HOSTS_IPS, cache_max_age: DEFAULT_CACHE_MAX_AGE, varnish_port: DEFAULT_VARNISH_PORT)
+    def set_varnish_settings(custom_cache_header: DEFAULT_CUSTOM_CACHE_HEADER,
+                              hosts_ips: DEFAULT_HOSTS_IPS,
+                              cache_max_age: DEFAULT_CACHE_MAX_AGE,
+                              varnish_port: DEFAULT_VARNISH_PORT,
+                              worker_throttling: {}
+                            )
       varnish_settings = {
         custom_cache_header: custom_cache_header.freeze,
         hosts_ips: Array(hosts_ips),
         varnish_port: varnish_port,
         cache_max_age: cache_max_age,
+        worker_throttling: DEFAULT_THROTTLING_SETTINGS.merge(worker_throttling)
       }
 
       raise InvalidSettingsError, error_message(:varnish, varnish_settings) if varnish_settings.values.any? { |value| value.blank? }

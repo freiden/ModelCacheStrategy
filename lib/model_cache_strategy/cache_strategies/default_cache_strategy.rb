@@ -80,7 +80,7 @@ module ModelCacheStrategy
     protected
 
       def dispatch_condition(conditional)
-        # conditional.call(...) used to manage Proc: Proc.new { |object| object.valid? }
+        # INFO: conditional.call(...) used to manage Proc: Proc.new { |object| object.valid? }
         conditional.is_a?(Symbol) ? self.send(conditional) : conditional.call(resource)
       end
 
@@ -103,7 +103,6 @@ module ModelCacheStrategy
       end
 
       def has_valid_settings?(settings)
-        # binding.pry
         condition = true
         on = settings[:on].include?(callback_type)
 

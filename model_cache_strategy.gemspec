@@ -9,8 +9,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ["charles FD", "Guillaume Garcera"]
   spec.email         = ["charles.freitas-denke@vodeclic.com", "guillaume.garcera@vodeclic.com"]
 
-  spec.summary       = %q{Write a short summary, because Rubygems requires one.}
-  spec.description   = %q{Write a longer description or delete this line.}
+  spec.summary       = %q{This allow to send adequate data to specified services based on Rails model modification callback.}
+  spec.description   = %q{This allow to send adequate data to specified services based on Rails model modification callback. For the moment it manage only SNS and Varnish.}
   # spec.homepage      = "."
 
   # Prevent pushing this gem to RubyGems.org by setting 'allowed_push_host', or
@@ -26,9 +26,10 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_dependency 'sidekiq', '~> 3.3.4'
-  spec.add_dependency 'aws-sdk', '~> 2.1.21'
-  spec.add_dependency 'rails', '~> 3.2'
+  spec.add_dependency 'sidekiq',           '~> 3.3.4'
+  spec.add_dependency 'sidekiq-throttler', '~> 0.4.1'
+  spec.add_dependency 'aws-sdk',           '~> 2.1.21'
+  spec.add_dependency 'rails',             '~> 3.2'
 
   spec.add_development_dependency "bundler",    "~> 1.10"
   spec.add_development_dependency "rake",       "~> 10.0"

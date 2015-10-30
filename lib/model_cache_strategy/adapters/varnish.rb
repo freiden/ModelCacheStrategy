@@ -29,11 +29,11 @@ module ModelCacheStrategy
       def expire!(callback_type = nil)
         yield self
 
-        # ModelCacheStrategy::Workers::VarnishCacheExpirationsWorker.perform_async(expiration_regexp.uniq, callback_type)
-        puts ">"*50 + " expiration_regexp size: #{expiration_regexp.size}"
-        expiration_regexp.uniq.each_with_index do |expiration_regex, index|
+        # puts ">"*50 + " expiration_regexp size: #{expiration_regexp.size}"
+        Array(expiration_regexp).uniq.each_with_index do |expiration_regex, index|
           ModelCacheStrategy::Workers::VarnishCacheExpirationsWorker.perform_async(expiration_regex, callback_type, index)
         end
+        reset!
       end
 
       def expire_cache!(expiration_regex, callback_type: nil)
@@ -45,14 +45,18 @@ module ModelCacheStrategy
         end
       end
 
-      def set_expiration(name, ids = [])
-        ids = Array(ids)
-        self.expiration_regexp ||= []
-        generate_expiration_regex(name, ids) unless ids.blank?
+      def reset!
+        self.expiration_regexp = []
       end
 
-      def set_global_expiration(_, _)
-        self.expiration_regexp = %w('.*')
+      def set_expiration(name, ids = [])
+        ids = Array(ids).uniq.sort
+        self.expiration_regexp ||= []
+        set_expiration_regex(name, ids) unless ids.blank?
+      end
+
+      def set_global_expiration(resources_to_expire, _)
+        self.expiration_regexp = resources_to_expire.is_a?(Array) ? resources_to_expire.join('|') : %w('.*')
       end
 
       def type
@@ -63,24 +67,29 @@ module ModelCacheStrategy
 
     private
 
-      def generate_expiration_regex(name, ids)
-        # "(#{name}($|.*/#{ids.join('/')}(/|$)))".gsub('/', '\/')
-        ids.sort.each_slice(SLICE_SIZE) do |slice_ids|
-          self.expiration_regexp << "(#{name}($|.*/#{slice_ids.join('/')}(/|$)))".gsub('/', '\/')
-        end
-      end
-
       def call_varnish(host_ip:, varnish_port:, expiration_regex:, callback_type:)
         http = Net::HTTP.new(host_ip, varnish_port)
         request = Ban.new("/")
         request.initialize_http_header({ 'X-Invalidates' => expiration_regex })
         response = http.request(request)
-        Rails.logger.debug "[BAN RESPONSE] " + response.inspect
-        # puts ">"*50 + " [BAN RESPONSE] expiration_regex: #{expiration_regex} - response: #{response.inspect}"
+        Rails.logger.debug "[BAN RESPONSE] expiration_regex: #{expiration_regex} - response: #{response.inspect}"
         response
       rescue StandardError => se
         Rails.logger.error "Banning failed due to: \n" + se.message
         Rails.logger.error se.backtrace
+      end
+
+      def generate_expiration_regex(name, ids)
+        ids_regexes = ids.map { |id| "/#{id}(/|$)" }
+        "(#{name}($|(.*)(#{ids_regexes.join('|')})))".gsub('/','\/')
+      end
+
+      def set_expiration_regex(name, ids)
+        # WARN: Format of regex generated: (subjects($|(.*)(\/1(\/|$)|\/2(\/|$)|\/3(\/|$))))
+        ## for each element id: '\/1(\/|$)', easily readable!! :)
+        ids.sort.each_slice(SLICE_SIZE) do |slice_ids|
+          self.expiration_regexp << generate_expiration_regex(name, slice_ids)
+        end
       end
 
     end

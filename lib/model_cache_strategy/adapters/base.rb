@@ -22,7 +22,7 @@ module ModelCacheStrategy
         raise 'TBD in each adapter'
       end
 
-      def set_global_expiration(name, ids)
+      def set_global_expiration(resources_to_expire, ids)
         raise 'TBD in each adapter'
       end
 
@@ -30,9 +30,9 @@ module ModelCacheStrategy
         raise 'TBD in each adapter'
       end
 
-      # def enabled?
-      #   true
-      # end
+      def reset!
+        raise 'TBD in each adapter'
+      end
     end
   end
 end

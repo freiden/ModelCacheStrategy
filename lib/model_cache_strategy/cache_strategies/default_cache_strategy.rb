@@ -8,13 +8,12 @@ module ModelCacheStrategy
 
       #################################################### Class methods ###################################################
 
-      def self.cache_key
-        ModelCacheStrategy.resource_name_for_strategy(self)
+      def self.adapters
+        get_current_adapters
       end
 
-      def self.custom_cache_header(ids = nil)
-        custom_cache_header = ModelCacheStrategy.configuration.varnish[:custom_cache_header]
-        [custom_cache_header, generate_cache_key(ids)]
+      def self.cache_key
+        ModelCacheStrategy.resource_name_for_strategy(self)
       end
 
       def self.cache_control
@@ -27,23 +26,20 @@ module ModelCacheStrategy
         end
       end
 
+      def self.custom_cache_header(ids = nil)
+        custom_cache_header = ModelCacheStrategy.configuration.varnish[:custom_cache_header]
+        [custom_cache_header, generate_cache_key(ids)]
+      end
+
+      def self.expire_all!
+        raise 'TBD in inheriting strategies'
+      end
+
       def self.generate_cache_key(ids = nil)
         return cache_key.to_s if ids.blank?
 
         ids = Array(ids).sort.uniq
         "#{cache_key}/#{ids.join('/')}"
-      end
-
-      def self.use_adapter_for(adapter_name, on: [:create, :update, :delete], **options)
-        adapter_setting = {}
-        adapter_setting[adapter_name.to_sym] = options.merge({ on: Array(on) })
-
-        self.used_adapters ||= {}
-        self.used_adapters.merge!(adapter_setting)
-      end
-
-      def self.adapters
-        get_current_adapters
       end
 
       def self.get_current_adapters
@@ -56,6 +52,14 @@ module ModelCacheStrategy
 
       def self.get_varnish_adapter
         get_current_adapters.by_type(ModelCacheStrategy::Adapters::Varnish.type).try(:last)
+      end
+
+      def self.use_adapter_for(adapter_name, on: [:create, :update, :delete], **options)
+        adapter_setting = {}
+        adapter_setting[adapter_name.to_sym] = options.merge({ on: Array(on) })
+
+        self.used_adapters ||= {}
+        self.used_adapters.merge!(adapter_setting)
       end
 
 

@@ -55,7 +55,7 @@ module ModelCacheStrategy
         set_expiration_regex(name, ids) unless ids.blank?
       end
 
-      def set_global_expiration(resources_to_expire, _)
+      def set_global_expiration(resources_to_expire, ids = nil)
         self.expiration_regexp = resources_to_expire.is_a?(Array) ? resources_to_expire.join('|') : %w('.*')
       end
 

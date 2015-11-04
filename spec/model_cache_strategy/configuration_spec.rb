@@ -22,7 +22,7 @@ module ModelCacheStrategy
         hosts_ips: Array(ModelCacheStrategy::Configuration::DEFAULT_HOSTS_IPS),
         cache_max_age: ModelCacheStrategy::Configuration::DEFAULT_CACHE_MAX_AGE,
         varnish_port: ModelCacheStrategy::Configuration::DEFAULT_VARNISH_PORT,
-        worker_throttling: ModelCacheStrategy::Configuration::DEFAULT_THROTTLING_SETTINGS
+        worker_throttling: {}
       }
     }
 

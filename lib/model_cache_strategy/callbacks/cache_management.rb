@@ -17,7 +17,6 @@ module ModelCacheStrategy
             after_destroy -> { resource_hook(:delete) }, options
 
             define_method :resource_hook do |callback_type|
-              # puts ">"*50 + " callback_type: #{callback_type} - It works!!"
               ModelCacheStrategy.for(cached_resource_name).new(self, callback_type: callback_type).expire!
             end
           end

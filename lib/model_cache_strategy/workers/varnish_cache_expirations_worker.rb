@@ -5,12 +5,13 @@ module ModelCacheStrategy
     class VarnishCacheExpirationsWorker
       include Sidekiq::Worker
 
-      # sidekiq_options throttle: { threshold: 3, period: 1.second }, queue: :varnish_expiration
-      sidekiq_options :queue => :varnish_expiration,  throttle: { #threshold: Proc.new { 3 }, period: Proc.new { 1.second } }
-        threshold: Proc.new { ModelCacheStrategy.configuration.varnish[:worker_throttling][:threshold] },
-        period:    Proc.new { ModelCacheStrategy.configuration.varnish[:worker_throttling][:period] }
-      }
+      # TODO: Remove those settings unless throttling considered useful again!!
+      # sidekiq_options :queue => :varnish_expiration,  throttle: {
+      #   threshold: Proc.new { ModelCacheStrategy.configuration.varnish[:worker_throttling][:threshold] },
+      #   period:    Proc.new { ModelCacheStrategy.configuration.varnish[:worker_throttling][:period] }
+      # }
 
+      sidekiq_options :queue => :varnish_expiration
 
 
 

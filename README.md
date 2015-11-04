@@ -25,6 +25,7 @@ Or install it yourself as:
       hosts_ips: Gaston.hosts.varnish.ips,
       cache_max_age:       6.hours,
       custom_cache_header: 'X-Invalidated-By',
+      worker_throttling: { threshold: 3, period: 1.second },
     }
     config.sns     = {
       region:            ENV['AWS_REGION'],
@@ -44,19 +45,19 @@ Or install it yourself as:
 * Stragegies must be defined in the 'app/model_cache_strategies' directory of your Rails app.
 * To associate a Model to a strategy:
   * Define a hook in the model class:
-  
+
     ```ruby
       resource_hook :assessments
     ```
-    
+
   * Declare the association into the gem initializer:
-  
+
     ```ruby
       ModelCacheStrategy.register_strategy_for(:assessments, AssessmentCacheStrategy)
     ```
 * Your strategies must inherit from the class DefaultCacheStrategy, defining the default behavior expecting with the managed services.
   * Your strategies must defined a protected method named *expire_cache*, using the defined adapters to expire the relateds contents:
-  
+
     ```ruby
       adapters.expire!(callback_type) do |ca|
         ca.set_expiration(self.class.cache_key, resource.id)
@@ -65,18 +66,25 @@ Or install it yourself as:
       end
     ```
   * Each strategies could use independently one of the defined adapters and specified on which callback it should run:
-  
+
     ```ruby
       use_adapter_for :sns,     topic_name: Gaston.sns.topic_name
       use_adapter_for :varnish
     ```
-    
+
   OR
-  
+
     ```ruby
       use_adapter_for :varnish, on: [:update, :delete]
     ```
-
+* To enable the throttling functionality you need to add Sidekiq Throttler these to your Sidekiq initializer:
+ ```ruby
+  Sidekiq.configure_server do |config|
+  config.server_middleware do |chain|
+    chain.add Sidekiq::Throttler, storage: :redis
+  end
+end
+ ```
 
 
 ## Development

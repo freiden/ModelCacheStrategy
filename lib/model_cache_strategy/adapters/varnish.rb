@@ -29,7 +29,6 @@ module ModelCacheStrategy
       def expire!(callback_type = nil)
         yield self
 
-        # puts ">"*50 + " expiration_regexp size: #{expiration_regexp.size}"
         Array(expiration_regexp).uniq.each_with_index do |expiration_regex, index|
           ModelCacheStrategy::Workers::VarnishCacheExpirationsWorker.perform_async(expiration_regex, callback_type, index)
         end

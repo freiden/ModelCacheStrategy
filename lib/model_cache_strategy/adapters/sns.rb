@@ -28,7 +28,6 @@ module ModelCacheStrategy
       end
 
       def set_global_expiration(resources_to_expire, ids)
-        # set_expiration(resources_to_expire, ids)
         self.expiration_regexp = if resources_to_expire.is_a?(Array)
           resources_to_expire.each { |rte| set_expiration(rte, :all) }
         else

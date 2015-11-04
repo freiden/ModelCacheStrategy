@@ -101,7 +101,6 @@ module ModelCacheStrategy
 
       def filtered_used_adapters
         used_adapters.select do |adapter_name, settings|
-          # settings[:on].include?(callback_type)
            has_valid_settings?(settings)
         end
       end
@@ -110,10 +109,6 @@ module ModelCacheStrategy
         condition = true
         on = settings[:on].include?(callback_type)
 
-        # # If conditional has precedence on unless conditional:
-        # if settings[:if].present? || settings[:unless].present?
-        #   conditional = settings[:if].presence || settings[:unless].presence
-        # end
         if settings[:if].present?
           condition = dispatch_condition(settings[:if])
         end
@@ -122,7 +117,6 @@ module ModelCacheStrategy
           condition = dispatch_condition(settings[:unless])
         end
 
-        # on && (conditional.is_a?(Symbol) ? self.send(conditional) : conditional.call(resource))
         on && condition
       end
 

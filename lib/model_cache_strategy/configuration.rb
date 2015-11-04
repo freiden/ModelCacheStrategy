@@ -1,13 +1,11 @@
 module ModelCacheStrategy
   class Configuration
-    # attr_reader :varnish, :sns, :adapters
     attr_reader :adapters
 
     DEFAULT_CACHE_MAX_AGE       = 900
     DEFAULT_CUSTOM_CACHE_HEADER = 'X-Invalidated-By'.freeze
     DEFAULT_HOSTS_IPS           = '127.0.0.1'.freeze
     DEFAULT_VARNISH_PORT        = 80
-    DEFAULT_THROTTLING_SETTINGS = { threshold: 3, period: 1.second }.freeze
 
 
     def initialize(varnish_settings: {}, sns_settings: {}, adapters: [])
@@ -93,10 +91,12 @@ module ModelCacheStrategy
         hosts_ips: Array(hosts_ips),
         varnish_port: varnish_port,
         cache_max_age: cache_max_age,
-        worker_throttling: DEFAULT_THROTTLING_SETTINGS.merge(worker_throttling)
+        worker_throttling: worker_throttling
       }
 
-      raise InvalidSettingsError, error_message(:varnish, varnish_settings) if varnish_settings.values.any? { |value| value.blank? }
+      if varnish_settings.any? { |key, value| :worker_throttling != key && value.blank? }
+        raise InvalidSettingsError, error_message(:varnish, varnish_settings)
+      end
 
       varnish_settings
     end

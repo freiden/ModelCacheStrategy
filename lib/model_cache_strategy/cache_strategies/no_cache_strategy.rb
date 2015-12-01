@@ -9,7 +9,7 @@ module ModelCacheStrategy
         []
       end
 
-      def self.cache_control(_)
+      def self.cache_control
         ['Cache-Control', 'private, no-cache']
       end
 
